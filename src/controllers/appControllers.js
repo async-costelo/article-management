@@ -3,7 +3,6 @@
 // load modules
 const moment = require('moment');
 const Model = require('../model/appModels');
-const CryptoJS = require("crypto-js");
 
 exports.register_user = async (req, res) => {
 
@@ -50,6 +49,21 @@ exports.get_user = async function (req, res) {
     }
 }
 
+exports.fetch_name = async function (req, res) {
+
+    try {
+
+        let user = await Model.Users.fetchName(req.body.name);
+        res.send(user);
+    }
+    catch (e) {
+
+        res.send(e)
+        console.error(e)
+
+    }
+}
+
 exports.authenticate_session = async (req, res) => {
 
     let email = req.body.email;
@@ -86,4 +100,47 @@ exports.authenticate_session = async (req, res) => {
         res.status(400).send(error_message);
 
 
+}
+
+exports.create_article = async (req, res) => {
+    // let new_article = new Model.Articles(req.body);
+
+    // let error_message = {
+    //     error: 1,
+    //     message: 'Please provide valid data'
+    // }
+
+    // // Handle null values via API call 
+    // if (!new_article.description || !new_article.message || !new_article.title)
+    //     res.status(400).send(error_message);
+    // else {
+
+    //     try {
+
+    //         let article = await Model.Articles.createArticle(new_article);
+    //         res.json(article);
+    //     }
+
+    //     catch (e) {
+
+    //         res.send(e)
+    //         console.error(e)
+    //     }
+
+    // }
+}
+
+exports.fetch_user_article = async (req, res) => {
+
+    try {
+
+        let user = await Model.Articles.getArticlePerUser(req.params.uid);
+        res.json(user);
+    }
+    catch (e) {
+
+        res.send(e)
+        console.error(e)
+
+    }
 }

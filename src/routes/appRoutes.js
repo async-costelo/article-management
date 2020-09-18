@@ -4,23 +4,17 @@ module.exports = function (app) {
 
     const func = require('../controllers/appControllers');
 
-    // // todoList Routes
-    // app.route('/contents')
-    //     .get(contentList.get_content);
 
-    // app.route('/content/:id')
-    //     .put(contentList.update_content);
+    app.route('/api/articles/:uid').get();
 
-    // app.route('/mailer')
-    //     .post(contentList.send_email);
+    app.route('/api/articles/:id').delete();
 
-    // app.route('/logs')
-    //     .get(contentList.get_logs);
+    app.route('/api/articles/:id').put();
 
-    app.route('/auth').post(func.authenticate_session);
+    app.route('/api/auth').post(func.authenticate_session);
 
-    app.route('/register').post(func.register_user);
+    app.route('/api/register').post(func.register_user);
 
-    //app.route('/get').get(func.get_user);
+    app.route('/api/fetch-id').get(func.fetch_name);
 
 };

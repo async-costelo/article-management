@@ -67,7 +67,7 @@ let register = () => {
         // Invoke AJAX call to /register
         $.ajax({
             type: 'post',
-            url: '/register',
+            url: '/api/register',
             contentType: 'application/json',
             data: JSON.stringify(obj_data),
             success: function (res) {
@@ -124,7 +124,7 @@ let login = () => {
         //Invoke AJAX call to /auth
         $.ajax({
             type: 'post',
-            url: '/auth',
+            url: '/api/auth',
             contentType: 'application/json',
             data: JSON.stringify(obj_data),
             success: function (res) {

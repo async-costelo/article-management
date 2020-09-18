@@ -4,12 +4,13 @@ const conn = require('./db');
 const CryptoJS = require("crypto-js");
 
 //Article object constructor
-var Article = function (article) {
+var Articles = function (article) {
     this.title = article.title;
     this.description = article.description;
     this.message = article.message;
     this.headerimg = article.headerimg;
     this.thumbnailimg = article.thumbnailimg;
+    this.user_id = article.user_id;
     this.created_at = new Date();
 };
 
@@ -45,9 +46,7 @@ Users.registerUser = async function (newUser, result) {
         else {
             // Encrypt password
             newUser.password = CryptoJS.AES.encrypt(newUser.password, process.env.SECRET).toString();
-
             let user = await conn.executeQuery("INSERT INTO users set ?", newUser);
-
             return return_value(true);
         }
     }
@@ -55,8 +54,8 @@ Users.registerUser = async function (newUser, result) {
         return return_value(e, 1);
     }
 
-
 };
+
 
 // Fetch a User
 Users.fetchUser = async function (fetchUser) {
@@ -81,5 +80,79 @@ Users.fetchUser = async function (fetchUser) {
 
 };
 
+// Fetch name for profile
+Users.fetchName = async function (name) {
+    console.log(name)
+    try {
+        let user = await conn.executeQuery("SELECT id, name FROM users WHERE name = ?", name);
 
-module.exports = { Users }
+        // Convert RowPacketData to object and gets first element
+        user = JSON.parse(JSON.stringify(user))[0]
+
+        return return_value(user);
+    }
+    catch (e) {
+        return return_value(e, 1);
+    }
+}
+
+
+Articles.createArticle = async function (Articles) {
+
+    try {
+
+        let user = await conn.executeQuery("SELECT id FROM users WHERE id = ?", Articles.user_id);
+
+        // Convert RowPacketData to object and gets first element
+        user = JSON.parse(JSON.stringify(user))[0];
+
+        // Check if user_id is existing from Users table
+        if (!user.id)
+            return return_value(false);
+        else {
+            let article = await conn.executeQuery("INSERT INTO articles set ?", Articles);
+            return return_value(true);
+        }
+
+
+    }
+
+    catch (e) {
+        return return_value(e, 1);
+    }
+}
+
+Articles.getArticlePerUser = async function (user_id) {
+    try {
+
+        let x = await conn.executeQuery("SELECT * FROM articles WHERE user_id = ?", user_id);
+
+        return return_value(x);
+
+    }
+    catch (e) {
+        return return_value(e, 1);
+    }
+}
+
+Articles.getAllArticles = async function () {
+    try {
+
+        let articles = await conn.executeQuery("SELECT * FROM articles", '');
+
+        // Convert RowPacketData to object and gets first element
+        articles = JSON.parse(JSON.stringify(articles))
+
+        return return_value(articles);
+    }
+    catch (e) {
+        return return_value(e, 1);
+    }
+}
+
+Articles.removeArticlePerUser = async function (user) {
+
+}
+
+
+module.exports = { Users, Articles }
