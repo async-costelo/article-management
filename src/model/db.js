@@ -16,6 +16,7 @@ var pool = mysql.createPool({
 
 
 module.exports.executeQuery = async function (queryst, value = null, callback) {
+
     return new Promise((resolve) => {
         pool.getConnection(function (err, connection) {
 
@@ -49,4 +50,5 @@ module.exports.executeQuery = async function (queryst, value = null, callback) {
 
         });
     });
+
 }

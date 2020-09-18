@@ -26,6 +26,7 @@
     "webpack-cli": "3.3.12"
   },
   "dependencies": {
+    "crypto-js": "4.0.0",
     "dotenv": "8.2.0",
     "express": "4.17.1",
     "express-session": "1.17.1",

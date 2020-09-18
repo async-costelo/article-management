@@ -1,14 +1,15 @@
 'use strict';
 
 const conn = require('./db');
+const CryptoJS = require("crypto-js");
 
 //Article object constructor
 var Article = function (article) {
     this.title = article.title;
     this.description = article.description;
     this.message = article.message;
-    this.status = article.status;
-    this.thumbnail = article.thumbnail;
+    this.headerimg = article.headerimg;
+    this.thumbnailimg = article.thumbnailimg;
     this.created_at = new Date();
 };
 
@@ -25,10 +26,7 @@ var Users = function (user) {
 let return_value = (val, error = 0) => {
 
     return new Promise((resolve, reject) => {
-        if (error == 1)
-            reject(val);
-
-        resolve(val)
+        resolve(val);
     })
 
 }
@@ -36,32 +34,49 @@ let return_value = (val, error = 0) => {
 // Inserts newly registered User
 Users.registerUser = async function (newUser, result) {
 
-    let email_exists = await conn.executeQuery("SELECT user FROM users WHERE email = ?", newUser.email);
+    try {
 
-    if (email_exists) {
-        await conn.executeQuery("INSERT INTO users set ?", newUser, function (res) {
-            result(res)
-        });
+        let existing_user = await conn.executeQuery("SELECT id FROM users WHERE email = ?", newUser.email);
+
+        existing_user = JSON.parse(JSON.stringify(existing_user));
+
+        if (existing_user.length > 0)
+            return return_value(false);
+        else {
+            // Encrypt password
+            newUser.password = CryptoJS.AES.encrypt(newUser.password, process.env.SECRET).toString();
+
+            let user = await conn.executeQuery("INSERT INTO users set ?", newUser);
+
+            return return_value(true);
+        }
     }
-    else
-        return_value("error", 1);
+    catch (e) {
+        return return_value(e, 1);
+    }
+
 
 };
 
 // Fetch a User
-Users.fetchUser = async function () {
+Users.fetchUser = async function (fetchUser) {
 
     try {
 
-        let user = await conn.executeQuery("SELECT user FROM users WHERE email = ? AND password = ?",);
+        let user = await conn.executeQuery("SELECT id, name, password FROM users WHERE email = ?", fetchUser[0]);
 
-        return_value(user);
+        // Convert RowPacketData to object and gets first element
+        user = JSON.parse(JSON.stringify(user))[0];
+
+        // Decrypt cipher to match our plaintext password
+        if (CryptoJS.AES.decrypt(user.password, process.env.SECRET).toString(CryptoJS.enc.Utf8) == fetchUser[1])
+            return return_value({ name: user.name, bool_ex: true });
+        else
+            return return_value(false);
 
     }
     catch (e) {
-
-        return_value(e, 1);
-
+        return return_value(e, 1);
     }
 
 };
