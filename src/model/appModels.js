@@ -110,7 +110,9 @@ Articles.createArticle = async function (Articles) {
         if (!user.id)
             return return_value(false);
         else {
+
             let article = await conn.executeQuery("INSERT INTO articles set ?", Articles);
+
             return return_value(true);
         }
 

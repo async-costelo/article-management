@@ -7,19 +7,19 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "start-dev": "nodemon ./src/index.js localhost 3000",
-    "start": "node ./src/index.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/async-costelo/article-management.git"
+    "url": "git+https://github.com/async-costelo/sample-article-management.git"
   },
   "keywords": [],
   "author": "Aj Costelo",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/async-costelo/article-management/issues"
+    "url": "https://github.com/async-costelo/sample-article-management/issues"
   },
-  "homepage": "https://github.com/async-costelo/article-management#readme",
+  "homepage": "https://github.com/async-costelo/sample-article-management#readme",
   "devDependencies": {
     "nodemon": "2.0.4",
     "webpack": "4.44.2",

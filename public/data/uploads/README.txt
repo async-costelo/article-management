@@ -1,0 +1,1 @@
+This is the relative path where images should be save.

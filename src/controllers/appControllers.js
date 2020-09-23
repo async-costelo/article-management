@@ -4,6 +4,7 @@
 const moment = require('moment');
 const Model = require('../model/appModels');
 
+
 exports.register_user = async (req, res) => {
 
     let new_user = new Model.Users(req.body);
@@ -103,31 +104,36 @@ exports.authenticate_session = async (req, res) => {
 }
 
 exports.create_article = async (req, res) => {
-    // let new_article = new Model.Articles(req.body);
 
-    // let error_message = {
-    //     error: 1,
-    //     message: 'Please provide valid data'
-    // }
+    let new_article = new Model.Articles(req.body);
+
+    let error_message = {
+        error: 1,
+        message: 'Please provide valid data'
+    }
+
+    new_article.thumbnailimg = '/data/uploads/' + req.file.filename;
+    new_article.user_id = 25;
+    new_article.message = req.body.newmessage;
+
+    delete req.body.uid;
+    delete req.body.newmessage;
+
+    try {
+
+        let article = await Model.Articles.createArticle(new_article);
+    }
+    catch (e) {
+
+        res.send(e)
+        console.error(e)
+
+    }
 
     // // Handle null values via API call 
     // if (!new_article.description || !new_article.message || !new_article.title)
     //     res.status(400).send(error_message);
-    // else {
 
-    //     try {
-
-    //         let article = await Model.Articles.createArticle(new_article);
-    //         res.json(article);
-    //     }
-
-    //     catch (e) {
-
-    //         res.send(e)
-    //         console.error(e)
-    //     }
-
-    // }
 }
 
 exports.fetch_user_article = async (req, res) => {

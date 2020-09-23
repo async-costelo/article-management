@@ -4,8 +4,25 @@ module.exports = function (app) {
 
     const func = require('../controllers/appControllers');
 
+    var crypto = require('crypto'),
+        multer = require('multer'),
+        path = require('path');
 
-    app.route('/api/articles/:uid').get();
+    var storage = multer.diskStorage({
+        destination: './public/data/uploads/',
+        filename: function (req, file, cb) {
+            crypto.pseudoRandomBytes(16, function (err, raw) {
+                if (err) return cb(err)
+                cb(null, raw.toString('hex') + path.extname(file.originalname))
+            })
+        }
+    })
+
+    var upload = multer({ storage: storage })
+
+    app.post('/api/article', upload.single('uploaded_file'), func.create_article)
+
+    app.route('/api/articles/:uid').get(func.fetch_user_article);
 
     app.route('/api/articles/:id').delete();
 
