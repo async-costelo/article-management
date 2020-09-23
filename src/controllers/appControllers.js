@@ -23,11 +23,11 @@ exports.register_user = async (req, res) => {
         try {
 
             let user = await Model.Users.registerUser(new_user);
-            res.json(user);
+            res.status(200).json(user);
         }
 
         catch (e) {
-            res.json(e)
+            res.status(500).json(e)
             console.error(e)
         }
 
@@ -39,12 +39,11 @@ exports.get_user = async function (req, res) {
     try {
 
         let user = await Model.Users.fetchUser([req.params.email, req.params.password]);
-
-        res.send(user);
+        res.status(200).json(user);
     }
     catch (e) {
 
-        res.send(e)
+        res.status(500).send(e)
         console.error(e)
 
     }
@@ -53,13 +52,12 @@ exports.get_user = async function (req, res) {
 exports.fetch_name = async function (req, res) {
 
     try {
-
-        let user = await Model.Users.fetchName(req.body.name);
-        res.send(user);
+        let user = await Model.Users.fetchName(req.session.identifier);
+        res.status(200).json(user);
     }
     catch (e) {
 
-        res.send(e)
+        res.status(500).send(e)
         console.error(e)
 
     }
@@ -83,22 +81,31 @@ exports.authenticate_session = async (req, res) => {
             let user = await Model.Users.fetchUser([email, password]);
 
             if (user.bool_ex) {
+
+                let len = (user.name).length / 2;
+                let half = (user.name).substring(0, len - 1);
+
                 req.session.loggedin = true;
-                req.session.identifier = user.name;
-                res.json(user);
+                req.session.identifier = user.session_name; // Use original hash for session
+
+                user.name = half; // Use half of hash
+
+                delete user.session_name; // Remove AES hash after assigning to identifier
+
+                res.status(200).json(user);
             }
             else
-                res.json(error_message);
+                res.status(401).json(error_message);
         }
         catch (e) {
 
-            res.send(e)
+            res.status(500).send(e)
             console.error(e)
 
         }
     }
     else
-        res.status(400).send(error_message);
+        res.status(401).send(error_message);
 
 
 }
@@ -112,8 +119,11 @@ exports.create_article = async (req, res) => {
         message: 'Please provide valid data'
     }
 
-    new_article.thumbnailimg = '/data/uploads/' + req.file.filename;
-    new_article.user_id = 25;
+    if (req.file != null && (req.file).hasOwnProperty('filename')) {
+        new_article.thumbnailimg = '/data/uploads/' + req.file.filename;
+    }
+
+    new_article.user_id = req.body.uid;
     new_article.message = req.body.newmessage;
 
     delete req.body.uid;
@@ -121,11 +131,12 @@ exports.create_article = async (req, res) => {
 
     try {
 
-        let article = await Model.Articles.createArticle(new_article);
+        await Model.Articles.createArticle(new_article);
+        res.redirect('back');
     }
     catch (e) {
 
-        res.send(e)
+        res.error(e)
         console.error(e)
 
     }
@@ -149,4 +160,8 @@ exports.fetch_user_article = async (req, res) => {
         console.error(e)
 
     }
+}
+
+exports.delete_user_article = async (req, res) => {
+
 }

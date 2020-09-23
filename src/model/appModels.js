@@ -1,7 +1,9 @@
 'use strict';
 
 const conn = require('./db');
-const CryptoJS = require("crypto-js");
+
+const CryptoJS = require("crypto-js"),
+    crypto = require('crypto');
 
 //Article object constructor
 var Articles = function (article) {
@@ -56,7 +58,6 @@ Users.registerUser = async function (newUser, result) {
 
 };
 
-
 // Fetch a User
 Users.fetchUser = async function (fetchUser) {
 
@@ -68,8 +69,13 @@ Users.fetchUser = async function (fetchUser) {
         user = JSON.parse(JSON.stringify(user))[0];
 
         // Decrypt cipher to match our plaintext password
-        if (CryptoJS.AES.decrypt(user.password, process.env.SECRET).toString(CryptoJS.enc.Utf8) == fetchUser[1])
-            return return_value({ name: user.name, bool_ex: true });
+        if (CryptoJS.AES.decrypt(user.password, process.env.SECRET).toString(CryptoJS.enc.Utf8) == fetchUser[1]) {
+
+            let md5_hash = CryptoJS.MD5(user.name, process.env.SECRET).toString();
+            let session_identifier = CryptoJS.AES.encrypt(user.name, process.env.SECRET).toString();
+
+            return return_value({ name: md5_hash, session_name: session_identifier, bool_ex: true });
+        }
         else
             return return_value(false);
 
@@ -82,10 +88,13 @@ Users.fetchUser = async function (fetchUser) {
 
 // Fetch name for profile
 Users.fetchName = async function (name) {
-    console.log(name)
-    try {
-        let user = await conn.executeQuery("SELECT id, name FROM users WHERE name = ?", name);
 
+    try {
+
+        // Decrypt identifier before passing to query
+        name = CryptoJS.AES.decrypt(name, process.env.SECRET).toString(CryptoJS.enc.Utf8);
+
+        let user = await conn.executeQuery("SELECT id, name FROM users WHERE name = ?", name);
         // Convert RowPacketData to object and gets first element
         user = JSON.parse(JSON.stringify(user))[0]
 
@@ -96,7 +105,7 @@ Users.fetchName = async function (name) {
     }
 }
 
-
+//
 Articles.createArticle = async function (Articles) {
 
     try {

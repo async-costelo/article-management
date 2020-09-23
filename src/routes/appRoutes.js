@@ -32,6 +32,6 @@ module.exports = function (app) {
 
     app.route('/api/register').post(func.register_user);
 
-    app.route('/api/fetch-id').get(func.fetch_name);
+    app.route('/api/userid').get(func.fetch_name);
 
 };

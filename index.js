@@ -31,11 +31,10 @@ app.get('/', function (req, res) {
 
 app.get('/profile/:name', async function (req, res) {
 
-    let user = await Model.Users.fetchName(req.params.name);
+    //let user = await Model.Users.fetchName(req.params.name);
 
-    if (req.session.loggedin && user) {
+    if (req.session.loggedin && req.session.identifier !== '')
         res.sendFile(path.join(__dirname, 'src/view/profile') + '/profile.html');
-    }
     else
         res.redirect('/');
 });

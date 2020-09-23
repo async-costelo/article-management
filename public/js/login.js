@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     $('.register').invisible();
 
-    // Declare funcs
+    // Initialize functions
     toggle();
     register();
     login();
