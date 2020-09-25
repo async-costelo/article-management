@@ -24,9 +24,9 @@ module.exports = function (app) {
 
     app.route('/api/articles/:uid').get(func.fetch_user_article);
 
-    app.route('/api/articles/:id').delete();
+    app.route('/api/articles/:uid/:id').delete(func.delete_user_article);
 
-    app.route('/api/articles/:id').put();
+    app.route('/api/articles/:uid/:id').put();
 
     app.route('/api/auth').post(func.authenticate_session);
 

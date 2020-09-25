@@ -164,4 +164,15 @@ exports.fetch_user_article = async (req, res) => {
 
 exports.delete_user_article = async (req, res) => {
 
+    try {
+
+        let delete_article = await Model.Articles.removeArticlePerUser([req.params.id, req.params.uid]);
+        res.status(200).json(delete_article);
+    }
+    catch (e) {
+
+        res.status(500).error(e)
+        console.error(e)
+
+    }
 }

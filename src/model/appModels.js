@@ -110,21 +110,21 @@ Articles.createArticle = async function (Articles) {
 
     try {
 
-        let user = await conn.executeQuery("SELECT id FROM users WHERE id = ?", Articles.user_id);
+        let user = await conn.executeQuery("SELECT id FROM users WHERE id = ?", Articles.user_id)
 
         // Convert RowPacketData to object and gets first element
         user = JSON.parse(JSON.stringify(user))[0];
 
+        console.log(user)
+
         // Check if user_id is existing from Users table
-        if (!user.id)
+        if (!user)
             return return_value(false);
         else {
 
             let article = await conn.executeQuery("INSERT INTO articles set ?", Articles);
-
             return return_value(true);
         }
-
 
     }
 
@@ -163,6 +163,25 @@ Articles.getAllArticles = async function () {
 
 Articles.removeArticlePerUser = async function (user) {
 
+    try {
+
+        let article = await conn.executeQuery("SELECT id, user_id FROM articles WHERE id = ? AND user_id = ?", user);
+
+        // Convert RowPacketData to object
+        article = JSON.parse(JSON.stringify(user));
+
+        // Check if user_id is existing from Users table
+        if (!article[1])
+            return return_value(false);
+        else {
+
+            await conn.executeQuery("DELETE FROM articles WHERE id = ?", article[0]);
+            return return_value(true);
+        }
+    }
+    catch (e) {
+        return return_value(e, 1);
+    }
 }
 
 
